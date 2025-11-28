@@ -25,17 +25,22 @@ jobs:
           cache-dependency-path: '**/*.csproj'
 
       - name: Restore
-        run: dotnet restore src/MyApp.sln
+        run: |
+          dotnet restore "csharp/src/VendorConnector/VendorConnector.csproj"
+          dotnet restore "csharp/tests/Unit/Unit.csproj"
+          dotnet restore "csharp/tests/Integration/Integration.csproj"
 
       - name: Build (Release)
-        run: dotnet build src/MyApp.sln --configuration Release --no-restore
-
-      - name: Test + Coverage
         run: |
-          dotnet test src/MyApp.sln --configuration Release --no-build \
-            --logger "trx;LogFileName=test-results.trx" \
-            --results-directory "${{ env.TEST_RESULTS_DIR }}" \
-            --collect:"XPlat Code Coverage"
+          dotnet build "csharp/src/VendorConnector/VendorConnector.csproj" --configuration Release --no-restore
+          dotnet build "csharp/tests/Unit/Unit.csproj" --configuration Release --no-restore
+          dotnet build "csharp/tests/Integration/Integration.csproj" --configuration Release --no-restore
+
+      - name: Test + Coverage (Unit)
+        run: dotnet test "csharp/tests/Unit/Unit.csproj" --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory "${{ env.TEST_RESULTS_DIR }}/Unit" --collect:"XPlat Code Coverage"
+      
+      - name: Test + Coverage (Integration)
+        run: dotnet test "csharp/tests/Integration/Integration.csproj" --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory "${{ env.TEST_RESULTS_DIR }}/Integration" --collect:"XPlat Code Coverage"
 
       - name: Generate HTML coverage
         uses: danielpalme/ReportGenerator-GitHub-Action@v5
