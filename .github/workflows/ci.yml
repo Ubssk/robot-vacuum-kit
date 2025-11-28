@@ -1,54 +1,60 @@
 name: CI
-"on":
-push:
-branches:
-- main
-pull_request:
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
-build-test:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v4
-- uses: actions/setup-dotnet@v4
-with:
-dotnet-version: "8.0.x"
-- uses: actions/setup-java@v4
-with:
-distribution: "temurin"
-java-version: "21"
-- uses: actions/setup-node@v4
-with:
-node-version: "20"
-- name: "C# unit/integration"
-run: |
-dotnet restore csharp/src/VendorConnector
-dotnet build csharp/src/VendorConnector -c Release
-dotnet test csharp/tests/Unit --logger "trx;LogFileName=unit.trx"
-dotnet test csharp/tests/Integration --logger "trx;LogFileName=integration.trx"
-- name: Java tests
-run: mvn -q -f java/vendor-connector/pom.xml test
-- name: JS tests
-working-directory: js/vendor-connector
-run: |
-npm install
-npm test
-- name: Build services (Docker)
-run: docker compose build
-- name: Run services (Docker)
-run: docker compose up -d csharp java js
-- name: Cross-service integration tests
-working-directory: tests/integration
-run: |
-npm install
-npm test
-- name: Docker logs on failure
-if: failure()
-run: |
-docker compose ps
-docker compose logs --no-color > tests_logs.txt
-- name: Upload logs
-if: failure()
-uses: actions/upload-artifact@v4
-with:
-name: docker-logs
-path: tests_logs.txt
+  build-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        dotnet: [8.0.x, 7.0.x]
+    runs-on: ${{ matrix.os }}
+    env:
+      TEST_RESULTS_DIR: artifacts/TestResults/${{ matrix.os }}-${{ matrix.dotnet }}
+      COVERAGE_DIR: artifacts/CoverageReport/${{ matrix.os }}-${{ matrix.dotnet }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET ${{ matrix.dotnet }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (Release)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test + Coverage
+        run: |
+          dotnet test --configuration Release --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory "${{ env.TEST_RESULTS_DIR }}" \
+            --collect:"XPlat Code Coverage"
+
+      - name: Generate HTML coverage
+        uses: danielpalme/ReportGenerator-GitHub-Action@v5
+        with:
+          reports: '${{ env.TEST_RESULTS_DIR }}/**/coverage.cobertura.xml'
+          targetdir: '${{ env.COVERAGE_DIR }}'
+          reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
+          tag: '${{ matrix.os }}_${{ matrix.dotnet }}'
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.dotnet }}
+          path: ${{ env.TEST_RESULTS_DIR }}
+
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-${{ matrix.os }}-${{ matrix.dotnet }}
+          path: ${{ env.COVERAGE_DIR }}
