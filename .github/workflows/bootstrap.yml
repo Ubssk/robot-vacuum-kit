@@ -17,7 +17,7 @@ jobs:
 
           REPO_ROOT="$PWD"
 
-          mkdir -p openapi infra docs tests/e2e/postman tests/integration \
+          mkdir -p openapi infra docs tests/e2e/postman tests/integration tests/integration/test \
                    csharp/src/VendorConnector csharp/tests/Unit csharp/tests/Integration \
                    csharp/src/VendorConnector/Controllers csharp/src/VendorConnector/Services \
                    java/vendor-connector/src/main/java/com/example/vendor/api \
