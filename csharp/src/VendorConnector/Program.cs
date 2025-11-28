@@ -25,22 +25,4 @@ app.UseHttpMetrics();
 app.MapMetrics("/metrics");
 app.Run();
 
-public partial class Program { }EOF
-
-cat > csharp/src/VendorConnector/Controllers/HealthController.cs <<'EOF'
-using Microsoft.AspNetCore.Mvc;
-
-namespace VendorConnector.Controllers
-{
-    [ApiController]
-    [Route("firmware")]
-    public class HealthController : ControllerBase
-    {
-        [HttpGet("can-update")]
-        public IActionResult CanUpdate([FromQuery] string now = "03:30", [FromQuery] string window = "22:00-04:00")
-        {
-            var ok = Services.FirmwarePolicy.CanUpdate(now, window);
-            return Ok(new { canUpdate = ok });
-        }
-    }
-}
+public partial class Program { }
