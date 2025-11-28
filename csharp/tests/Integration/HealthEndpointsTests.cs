@@ -23,4 +23,4 @@ public class HealthEndpointsTests : Xunit.IClassFixture<WebApplicationFactory<Pr
         var resp = await _client.GetAsync("/health/ready");
         Xunit.Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
-
+}
