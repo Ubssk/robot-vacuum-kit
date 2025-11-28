@@ -1,3 +1,5 @@
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
