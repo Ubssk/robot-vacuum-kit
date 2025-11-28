@@ -20,10 +20,14 @@ public class HealthEndpointsTests : IClassFixture<WebApplicationFactory<Program>
         Assert.True(res.IsSuccessStatusCode);
     }
 
+    private sealed record CanUpdateDto(bool canUpdate);
+
     [Fact]
     public async Task CanUpdate_ReturnsTrue()
     {
-        var res = await _client.GetFromJsonAsync<dynamic>("/firmware/can-update?now=03:30&window=22:00-04:00");
-        Assert.True((bool)res.canUpdate);
+        var res = await _client.GetFromJsonAsync<CanUpdateDto>("/firmware/can-update?now=03:30&window=22:00-04:00");
+        Assert.NotNull(res);
+        Assert.True(res!.canUpdate);
     }
+
 }
