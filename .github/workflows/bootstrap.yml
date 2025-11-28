@@ -1,0 +1,50 @@
+name: Bootstrap Repo
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate repository files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REPO_ROOT="$PWD"
+
+          mkdir -p openapi infra docs tests/e2e/postman tests/integration \
+                   csharp/src/VendorConnector csharp/tests/Unit csharp/tests/Integration \
+                   csharp/src/VendorConnector/Controllers csharp/src/VendorConnector/Services \
+                   java/vendor-connector/src/main/java/com/example/vendor/api \
+                   java/vendor-connector/src/main/java/com/example/vendor/service \
+                   java/vendor-connector/src/main/resources \
+                   java/vendor-connector/src/test/java/com/example/vendor/api \
+                   java/vendor-connector/src/test/java/com/example/vendor/service \
+                   js/vendor-connector/src js/vendor-connector/test \
+                   .github/workflows
+
+          cat > .gitignore <<'EOF'
+          .DS_Store
+          Thumbs.db
+          node_modules
+          npm-debug.log
+          yarn.lock
+          pnpm-lock.yaml
+          bin/
+          obj/
+          TestResults/
+          *.user
+          *.suo
+          target/
+          .mvn/wrapper/maven-wrapper.jar
+          .mvn/wrapper/maven-wrapper.properties
+          coverage/
+          tests/reports/
+          EOF
+
+          cat > README.md <<'EOF'
