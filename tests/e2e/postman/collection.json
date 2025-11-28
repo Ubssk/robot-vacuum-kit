@@ -1,0 +1,12 @@
+{
+  "info": { "name": "Robot Vacuum E2E", "_postman_id": "rv-e2e", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "item": [
+    { "name": "C# Ready",   "request": { "method": "GET", "url": "{{csharpBase}}/health/ready" }, "event": [{ "listen":"test","script":{"exec":["pm.test('200',()=>pm.response.to.have.status(200));"]}}]},
+    { "name": "Java Ready", "request": { "method": "GET", "url": "{{javaBase}}/actuator/health/readiness" }, "event": [{ "listen":"test","script":{"exec":["pm.test('200',()=>pm.response.to.have.status(200));"]}}]},
+    { "name": "JS Ready",   "request": { "method": "GET", "url": "{{jsBase}}/health/ready" }, "event": [{ "listen":"test","script":{"exec":["pm.test('200',()=>pm.response.to.have.status(200));"]}}]},
+    { "name": "JS CanUpdate", "request": { "method": "GET", "url": "{{jsBase}}/firmware/can-update?now=03:30&window=22:00-04:00" }, "event": [{ "listen":"test","script":{"exec":[
+      "pm.test('200',()=>pm.response.to.have.status(200));",
+      "pm.test('canUpdate true',()=>pm.expect(pm.response.json().canUpdate).to.eql(true));"
+    ]}}]}
+  ]
+}

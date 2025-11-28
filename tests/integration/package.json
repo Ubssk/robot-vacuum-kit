@@ -1,0 +1,14 @@
+{
+  "name": "integration-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "jest --runInBand --testTimeout=60000"
+  },
+  "dependencies": {
+    "got": "^14.4.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

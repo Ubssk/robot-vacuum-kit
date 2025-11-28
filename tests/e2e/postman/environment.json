@@ -1,0 +1,10 @@
+{
+  "id": "robot-env",
+  "name": "local",
+  "values": [
+    { "key": "csharpBase", "value": "http://localhost:5000", "enabled": true },
+    { "key": "javaBase",   "value": "http://localhost:8081", "enabled": true },
+    { "key": "jsBase",     "value": "http://localhost:8082", "enabled": true }
+  ],
+  "_postman_variable_scope": "environment"
+}

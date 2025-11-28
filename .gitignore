@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+target/
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+coverage/
+tests/reports/

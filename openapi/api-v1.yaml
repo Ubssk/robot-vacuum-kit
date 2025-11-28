@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Robot Vacuum Cloud API
+  version: 1.0.0
+servers:
+  - url: http://localhost
+paths:
+  /health/live:
+    get:
+      responses:
+        "200": { description: OK }
+  /health/ready:
+    get:
+      responses:
+        "200": { description: OK }
+        "503": { description: Not Ready }
+  /firmware/can-update:
+    get:
+      parameters:
+        - in: query
+          name: now
+          schema: { type: string, example: "03:30" }
+        - in: query
+          name: window
+          schema: { type: string, example: "22:00-04:00" }
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  canUpdate:
+                    type: boolean
