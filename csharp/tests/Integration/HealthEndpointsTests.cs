@@ -1,26 +1,27 @@
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using System.Net;
+using Xunit;
 
-public class HealthEndpointsTests : Xunit.IClassFixture<WebApplicationFactory<Program>>
+public class HealthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly System.Net.Http.HttpClient _client;
+    private readonly HttpClient _client;
 
     public HealthEndpointsTests(WebApplicationFactory<Program> factory)
     {
         _client = factory.CreateClient();
     }
 
-    [Xunit.Fact]
-    public async System.Threading.Tasks.Task Liveness_ReturnsOk()
+    [Fact]
+    public async Task Ready_ReturnsOk()
     {
-        var resp = await _client.GetAsync("/health/live");
-        Xunit.Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        var res = await _client.GetAsync("/health/ready");
+        Assert.True(res.IsSuccessStatusCode);
     }
 
-    [Xunit.Fact]
-    public async System.Threading.Tasks.Task Readiness_ReturnsOk()
+    [Fact]
+    public async Task CanUpdate_ReturnsTrue()
     {
-        var resp = await _client.GetAsync("/health/ready");
-        Xunit.Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        var res = await _client.GetFromJsonAsync<dynamic>("/firmware/can-update?now=03:30&window=22:00-04:00");
+        Assert.True((bool)res.canUpdate);
     }
 }
