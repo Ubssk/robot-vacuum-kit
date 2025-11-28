@@ -25,14 +25,14 @@ jobs:
           cache-dependency-path: '**/*.csproj'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore src/MyApp.sln
 
       - name: Build (Release)
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build src/MyApp.sln --configuration Release --no-restore
 
       - name: Test + Coverage
         run: |
-          dotnet test --configuration Release --no-build \
+          dotnet test src/MyApp.sln --configuration Release --no-build \
             --logger "trx;LogFileName=test-results.trx" \
             --results-directory "${{ env.TEST_RESULTS_DIR }}" \
             --collect:"XPlat Code Coverage"
