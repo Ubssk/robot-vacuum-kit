@@ -1,0 +1,54 @@
+name: CI
+"on":
+push:
+branches:
+- main
+pull_request:
+jobs:
+build-test:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v4
+- uses: actions/setup-dotnet@v4
+with:
+dotnet-version: "8.0.x"
+- uses: actions/setup-java@v4
+with:
+distribution: "temurin"
+java-version: "21"
+- uses: actions/setup-node@v4
+with:
+node-version: "20"
+- name: "C# unit/integration"
+run: |
+dotnet restore csharp/src/VendorConnector
+dotnet build csharp/src/VendorConnector -c Release
+dotnet test csharp/tests/Unit --logger "trx;LogFileName=unit.trx"
+dotnet test csharp/tests/Integration --logger "trx;LogFileName=integration.trx"
+- name: Java tests
+run: mvn -q -f java/vendor-connector/pom.xml test
+- name: JS tests
+working-directory: js/vendor-connector
+run: |
+npm install
+npm test
+- name: Build services (Docker)
+run: docker compose build
+- name: Run services (Docker)
+run: docker compose up -d csharp java js
+- name: Cross-service integration tests
+working-directory: tests/integration
+run: |
+npm install
+npm test
+- name: Docker logs on failure
+if: failure()
+run: |
+docker compose ps
+docker compose logs --no-color > tests_logs.txt
+- name: Upload logs
+if: failure()
+uses: actions/upload-artifact@v4
+with:
+name: docker-logs
+path: tests_logs.txt
