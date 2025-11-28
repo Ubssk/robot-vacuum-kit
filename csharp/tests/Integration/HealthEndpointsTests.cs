@@ -1,8 +1,7 @@
-using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
+using System.Net;
 
-public class HealthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
+public class HealthEndpointsTests : Xunit.IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly System.Net.Http.HttpClient _client;
 
@@ -11,17 +10,17 @@ public class HealthEndpointsTests : IClassFixture<WebApplicationFactory<Program>
         _client = factory.CreateClient();
     }
 
-    [Fact]
+    [Xunit.Fact]
     public async System.Threading.Tasks.Task Liveness_ReturnsOk()
     {
         var resp = await _client.GetAsync("/health/live");
-        Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        Xunit.Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
 
-    [Fact]
+    [Xunit.Fact]
     public async System.Threading.Tasks.Task Readiness_ReturnsOk()
     {
         var resp = await _client.GetAsync("/health/ready");
-        Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        Xunit.Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
-}
+
